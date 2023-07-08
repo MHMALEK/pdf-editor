@@ -1,0 +1,124 @@
+// const canvass = new fabric.Canvas("canvas", {
+//   isDrawingMode: false,
+// });
+
+// // create a textbox and add it to the canvas
+// const textbox = new fabric.Textbox("Hello, world!", { left: 10, top: 10 });
+// canvass.add(textbox);
+
+// // when the delete key is pressed, remove the currently active object
+// window.addEventListener("keydown", function (e) {
+//   // key code 46 is the delete key
+//   // key code 8 is the backspace key
+//   if (e.keyCode === 46 || e.keyCode === 8) {
+//     const activeObject = canvass.getActiveObject();
+
+//     if (activeObject) {
+//       canvass.remove(activeObject);
+//     }
+//   }
+// });
+
+// // when the textbox is moved or modified, log its new coordinates
+// canvass.on("object:moving", function (e) {
+//   if (e.target === textbox) {
+//     // console.log("x:", textbox.left, "y:", textbox.top, textbox.text);
+//   }
+// });
+
+// canvass.on("object:modified", function (e) {
+//   if (e.target === textbox) {
+//     console.log("x:", textbox.left, "y:", textbox.top, textbox.text);
+//   }
+// });
+
+// // // @ts-ignore
+// // document
+// //   .getElementById("pdf-upload")
+// //   .addEventListener("change", async function (event: any) {
+// //     var file = event.target.files[0];
+// //     if (file) {
+// //       var reader = new FileReader();
+
+// //       reader.onload = async function (event: any) {
+// //         var arrayBuffer = event.target.result;
+
+// //         const pdfDoc = await PDFDocument.load(arrayBuffer);
+// //         console.log(pdfDoc);
+// //       };
+
+// //       reader.readAsArrayBuffer(file);
+// //     }
+// //   });
+
+// async function addTextToPdf(text: string, x: number, y: number) {
+//   const pdfDoc = await PDFDocument.create();
+//   const page = pdfDoc.addPage();
+
+//   const { width, height } = page.getSize();
+
+//   const fontSize = 30;
+//   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+//   const textWidth = font.widthOfTextAtSize(text, fontSize);
+//   const textHeight = font.heightAtSize(fontSize);
+
+//   const textX = width / 2 - textWidth / 2;
+//   const textY = height - y - textHeight;
+
+//   page.drawText(text, {
+//     x: textX,
+//     y: textY,
+//     size: fontSize,
+//     font,
+//     color: rgb(0, 0, 0),
+//   });
+
+//   pdfDoc.save().then((data) => {
+//     var blob = new Blob([data], { type: "application/pdf" });
+//     var url = URL.createObjectURL(blob);
+
+//     // Create a link and click it to start the download
+//     var link = document.createElement("a");
+//     link.href = url;
+//     link.download = "output.pdf";
+//     link.click();
+//   });
+
+//   // pdfBytes is a Uint8Array containing the bytes of the PDF document
+//   // Depending on your environment, you can either write these bytes to a file,
+//   // or create a Blob object for download in a browser
+// }
+
+// async function modifyPdf(pdfDoc: PDFDocument) {
+//   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+//   const pages = pdfDoc.getPages();
+//   const firstPage = pages[0];
+//   const { width, height } = firstPage.getSize();
+//   firstPage.drawText("This is some new text!", {
+//     x: 50,
+//     y: height / 2 + 300,
+//     size: 50,
+//     font: helveticaFont,
+//     color: rgb(0.95, 0.1, 0.1),
+//     rotate: degrees(-45),
+//   });
+// }
+
+// const savePdf = (pdfDoc: PDFDocument) => {
+//   pdfDoc.save().then((data) => {
+//     var blob = new Blob([data], { type: "application/pdf" });
+//     var url = URL.createObjectURL(blob);
+
+//     // Create a link and click it to start the download
+//     var link = document.createElement("a");
+//     link.href = url;
+//     link.download = "output.pdf";
+//     link.click();
+//   });
+// };
+
+// const getPdfFile = () => {};
+
+// If absolute URL from the remote server is provided, configure the CORS
+// header on that server.
