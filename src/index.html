@@ -10,13 +10,8 @@
   </head>
   <body>
 
-    <div>
-      <button id="prev">Previous</button>
-      <button id="next">Next</button>
-      &nbsp; &nbsp;
-      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-    </div>
-    
+ 
+
     <div class="bg-gray-900 min-h-screen flex items-center justify-center">
       <div
         class="bg-gray-800 flex-1 flex flex-col space-y-5 lg:space-y-0 lg:flex-row lg:space-x-10 max-w-6xl sm:p-6 sm:my-2 sm:mx-4 sm:rounded-2xl"
@@ -208,9 +203,10 @@
               </a>
             </div>
           </div>
-          <div id="container"></div>
 
-          <canvas id="pdf-canvas"></canvas>
+         <div id="pdf-container" style="overflow-y: scroll; max-height:  60vh">
+
+         </div>
       </div>
     </div>
 
@@ -239,6 +235,12 @@
       <button id="italicButton">Italic</button>
       <button id="underlineButton">Underline</button>
     </div>
+
+    <button id="generate-pdf">Generate PDF</button>
+    <button id="add-page-pdf"> | add page |</button>
+    <button id="remove-page-pdf">| remove page |</button>
+
+    <button id="save-pdf">save PDF</button>
 
     <script>
       function format(command) {
