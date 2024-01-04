@@ -65142,9 +65142,14 @@ var jspdf_1 = require("jspdf");
 require("@simonwep/pickr/dist/themes/classic.min.css");
 var pickr_1 = __importDefault(require("@simonwep/pickr"));
 // Global variables
-var fabricCanvas;
 var isEditing = false;
 var color = "black";
+var currentPageId = null;
+// A map of canvas IDs to Fabric.js canvases
+var fabricCanvases = {};
+var currentFabricCanvas;
+var pageCount = 0;
+var currentPDF = null;
 // Create a color picker
 var colorPicker = createColorPicker(".color-picker");
 // Ensure pdfjs worker is initialized
@@ -65160,31 +65165,227 @@ document.getElementById("new-pdf-upload").addEventListener("click", function () 
 });
 // Helper functions
 function handlePDFUpload(e) {
-  var _this = this;
-  var file = e.target.files[0];
-  var reader = new FileReader();
-  reader.onload = function (event) {
-    return __awaiter(_this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var typedarray;
-      return _regeneratorRuntime().wrap(function _callee$(_context) {
-        while (1) switch (_context.prev = _context.next) {
-          case 0:
-            typedarray = new Uint8Array(event.target.result); // Load and render the first page of a PDF file
-            renderPDF(typedarray, "pdf-canvas").then(function (canvas) {
-              return createFabricCanvas(canvas, "pdf-canvas");
-            }).then(function () {
-              return setupEventListeners();
-            }).then(function () {
-              return toggleUploader(false);
-            });
-          case 2:
-          case "end":
-            return _context.stop();
-        }
-      }, _callee);
-    }));
-  };
-  reader.readAsArrayBuffer(file);
+  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+    var _this = this;
+    var file, reader;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          file = e.target.files[0];
+          reader = new FileReader();
+          reader.onload = function (event) {
+            return __awaiter(_this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+              var typedarray, pdf, i, canvasId, canvas;
+              return _regeneratorRuntime().wrap(function _callee$(_context) {
+                while (1) switch (_context.prev = _context.next) {
+                  case 0:
+                    typedarray = new Uint8Array(event.target.result); // Load the PDF file
+                    _context.next = 3;
+                    return pdfjsLib.getDocument({
+                      data: typedarray.buffer
+                    }).promise;
+                  case 3:
+                    pdf = _context.sent;
+                    currentPDF = pdf; // Store the uploaded PDF
+                    setupEventListeners();
+                    // Render each page of the PDF file
+                    i = 1;
+                  case 7:
+                    if (!(i <= pdf.numPages)) {
+                      _context.next = 18;
+                      break;
+                    }
+                    canvasId = "pdf-canvas-" + i;
+                    _context.next = 11;
+                    return renderPDF(pdf, canvasId, i);
+                  case 11:
+                    canvas = _context.sent;
+                    createFabricCanvas(canvas, canvasId);
+                    pageCount++; // Increment pageCount
+                    toggleUploader(false);
+                  case 15:
+                    i++;
+                    _context.next = 7;
+                    break;
+                  case 18:
+                  case "end":
+                    return _context.stop();
+                }
+              }, _callee);
+            }));
+          };
+          reader.readAsArrayBuffer(file);
+        case 4:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2);
+  }));
+}
+function getPageDimensions(pdf, pageNumber) {
+  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    var page, viewport;
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.next = 2;
+          return pdf.getPage(pageNumber);
+        case 2:
+          page = _context3.sent;
+          viewport = page.getViewport({
+            scale: 1
+          });
+          return _context3.abrupt("return", {
+            width: viewport.width,
+            height: viewport.height
+          });
+        case 5:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3);
+  }));
+}
+function addPageToPDF() {
+  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var referencePage, devicePixelRatio, viewport, canvasId, canvas;
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
+        case 0:
+          if (!currentPDF) {
+            _context4.next = 20;
+            break;
+          }
+          console.log(currentPDF, pageCount);
+          // Get the first page to use as a reference for the size
+          _context4.next = 4;
+          return currentPDF.getPage(1);
+        case 4:
+          referencePage = _context4.sent;
+          // Get the device pixel ratio
+          devicePixelRatio = window.devicePixelRatio || 1; // Get viewport based on the devicePixelRatio
+          viewport = referencePage.getViewport({
+            scale: devicePixelRatio
+          }); // Create a new canvas element
+          canvasId = "pdf-canvas-" + (pageCount + 1);
+          canvas = document.createElement("canvas");
+          canvas.id = canvasId;
+          // Adjust the canvas size based on the devicePixelRatio
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          canvas.style.width = "".concat(viewport.width / devicePixelRatio, "px");
+          canvas.style.height = "".concat(viewport.height / devicePixelRatio, "px");
+          // Append the div to the document body or any other container
+          document.getElementById("pdf-canvas-container").appendChild(canvas);
+          createFabricCanvas(canvas, canvasId);
+          pageCount++;
+          currentPageId = "pdf-canvas-" + pageCount;
+          _context4.next = 21;
+          break;
+        case 20:
+          console.log("No PDF selected");
+        case 21:
+        case "end":
+          return _context4.stop();
+      }
+    }, _callee4);
+  }));
+}
+function removePageFromPDF() {
+  if (currentPageId && currentPDF && currentPDF.numPages > 0) {
+    var canvasToRemove = fabricCanvases[currentPageId];
+    canvasToRemove.dispose();
+    delete fabricCanvases[currentPageId];
+    // Remove the corresponding HTML canvas element from the DOM
+    var canvasElement = document.getElementById(currentPageId);
+    canvasElement.parentNode.removeChild(canvasElement);
+    pageCount--; // Decrement pageCount
+    // Re-index page IDs for all the pages that come after the removed page
+    var removedPageNumber = parseInt(currentPageId.replace("pdf-canvas-", ""));
+    for (var i = removedPageNumber + 1; i <= pageCount + 1; i++) {
+      var oldCanvasId = "pdf-canvas-" + i;
+      var newCanvasId = "pdf-canvas-" + (i - 1);
+      // Update fabric canvases map
+      fabricCanvases[newCanvasId] = fabricCanvases[oldCanvasId];
+      delete fabricCanvases[oldCanvasId];
+      // Update HTML canvas element ID
+      var _canvasElement = document.getElementById(oldCanvasId);
+      _canvasElement.id = newCanvasId;
+    }
+    // Set currentPageId to the previous page if it exists
+    if (pageCount > 0) {
+      currentPageId = "pdf-canvas-" + pageCount;
+    } else {
+      currentPageId = null;
+    }
+  } else {
+    console.log("No page selected or PDF has no pages");
+  }
+}
+function createNewPDF() {
+  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var canvasId, canvas;
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
+        case 0:
+          if (!currentPDF) {
+            pageCount = 1;
+            canvasId = "pdf-canvas-" + pageCount;
+            canvas = document.createElement("canvas");
+            canvas.id = canvasId;
+            // Set the size of the canvas to A4 size at 72 DPI
+            canvas.width = 595;
+            canvas.height = 842;
+            document.getElementById("pdf-canvas-container").appendChild(canvas);
+            createFabricCanvas(canvas, canvasId);
+          } else {
+            console.log("A PDF is already selected");
+          }
+        case 1:
+        case "end":
+          return _context5.stop();
+      }
+    }, _callee5);
+  }));
+}
+function renderPDF(pdf, canvasId, pageNumber) {
+  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    var page, devicePixelRatio, viewport, canvas, context;
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.next = 2;
+          return pdf.getPage(pageNumber);
+        case 2:
+          page = _context6.sent;
+          // Get the device pixel ratio
+          devicePixelRatio = window.devicePixelRatio || 1; // Get viewport based on the devicePixelRatio
+          viewport = page.getViewport({
+            scale: devicePixelRatio
+          }); // Create a new canvas element
+          canvas = document.createElement("canvas");
+          canvas.id = canvasId;
+          context = canvas.getContext("2d"); // Adjust the canvas size based on the devicePixelRatio
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          canvas.style.width = "".concat(viewport.width / devicePixelRatio, "px");
+          canvas.style.height = "".concat(viewport.height / devicePixelRatio, "px");
+          // Append the div to the document body or any other container
+          document.getElementById("pdf-canvas-container").appendChild(canvas);
+          // Render the page
+          _context6.next = 15;
+          return page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+        case 15:
+          return _context6.abrupt("return", canvas);
+        case 16:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6);
+  }));
 }
 function createColorPicker(selector) {
   return pickr_1.default.create({
@@ -65216,48 +65417,14 @@ function initializePDFjsWorker() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URL;
   }
 }
-function renderPDF(url, canvasId) {
-  return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-    var pdf, page, viewport, canvas, context;
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-      while (1) switch (_context2.prev = _context2.next) {
-        case 0:
-          _context2.next = 2;
-          return pdfjsLib.getDocument({
-            data: url
-          }).promise;
-        case 2:
-          pdf = _context2.sent;
-          _context2.next = 5;
-          return pdf.getPage(1);
-        case 5:
-          page = _context2.sent;
-          viewport = page.getViewport({
-            scale: 1.0
-          });
-          canvas = document.getElementById(canvasId);
-          context = canvas.getContext("2d");
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          _context2.next = 13;
-          return page.render({
-            canvasContext: context,
-            viewport: viewport
-          }).promise;
-        case 13:
-          return _context2.abrupt("return", canvas);
-        case 14:
-        case "end":
-          return _context2.stop();
-      }
-    }, _callee2);
-  }));
-}
 function createFabricCanvas(canvas, fabricCanvasId) {
+  console.log("asdasd");
   var canvasImg = canvas.toDataURL();
-  fabricCanvas = new fabric_1.fabric.Canvas(fabricCanvasId, {
-    isDrawingMode: false
+  var fabricCanvas = new fabric_1.fabric.Canvas(fabricCanvasId, {
+    isDrawingMode: false,
+    backgroundColor: "white"
   });
+  fabricCanvases[fabricCanvasId] = fabricCanvas;
   fabricCanvas.on("text:editing:entered", function () {
     isEditing = true;
     setTimeout(function () {
@@ -65271,11 +65438,13 @@ function createFabricCanvas(canvas, fabricCanvasId) {
       toggleEditor(false);
     }, 400);
   });
+  fabricCanvas.on("mouse:down", function () {
+    handlePageClick(fabricCanvasId);
+  });
   fabric_1.fabric.Image.fromURL(canvasImg, function (img) {
     img.selectable = false;
     fabricCanvas.add(img);
   });
-  fabricCanvas.on("selection:created");
   fabricCanvas.on("selection:cleared", function () {
     toggleEditor(false);
   });
@@ -65314,31 +65483,80 @@ function setupEventListeners() {
   });
 }
 function savePDF() {
-  var doc = new jspdf_1.jsPDF();
-  var imgData = fabricCanvas.toDataURL({
-    format: "png"
+  // Instantiate a new jsPDF object in A4 size
+  var pdf = new jspdf_1.jsPDF();
+  // @ts-ignore
+  var allCanvasesPromises = Object.values(fabricCanvases).map(function (canvas) {
+    return canvas.toDataURL({
+      format: "jpeg",
+      multiplier: 1
+    });
   });
-  doc.addImage(imgData, 0, 0, 0, 0);
-  doc.save("download.pdf");
+  Promise.all(allCanvasesPromises).then(function (allCanvasDataUrls) {
+    allCanvasDataUrls.forEach(function (dataUrl, i) {
+      // @ts-ignore
+      var canvas = Object.values(fabricCanvases)[i];
+      var width = canvas.getWidth();
+      var height = canvas.getHeight();
+      var pdfWidth = pdf.internal.pageSize.getWidth();
+      var pdfHeight = pdf.internal.pageSize.getHeight();
+      var scale = 1;
+      // Check if the width of the image is larger than the page.
+      if (width > pdfWidth) {
+        scale = pdfWidth / width;
+      }
+      // Check if the height of the image is larger than the page.
+      if (height > pdfHeight) {
+        scale = Math.min(scale, pdfHeight / height);
+      }
+      pdf.addImage(dataUrl, "jpeg", 0, 0, width * scale, height * scale, undefined, "MEDIUM");
+      // Add a new page for the next canvas unless this is the last canvas
+      if (i < allCanvasDataUrls.length - 1) {
+        pdf.addPage();
+      }
+    });
+    pdf.save("document.pdf");
+  });
 }
+function handlePageClick(fabricCanvasId) {
+  currentPageId = fabricCanvasId;
+  currentFabricCanvas = fabricCanvases[currentPageId];
+  document.querySelectorAll("[data-selected='true']").forEach(function (el) {
+    // @ts-ignore
+    el.dataset["selected"] = "false";
+  });
+  document.getElementById(currentPageId).dataset["selected"] = "true";
+}
+// Add text to the current page
 function addText() {
-  var text = new fabric_1.fabric.IText("Hello, world!", {
-    left: 100,
-    top: 100,
-    fontSize: 30
-  });
-  fabricCanvas.add(text);
+  if (currentPageId) {
+    var fabricCanvas = fabricCanvases[currentPageId];
+    var text = new fabric_1.fabric.IText("Hello, world!", {
+      left: 100,
+      top: 100,
+      fontSize: 30
+    });
+    fabricCanvas.add(text);
+  } else {
+    // @ts-ignore
+    // it's been added via CDN
+    Snackbar.show({
+      pos: "top-center",
+      text: "هیچ صفحه‌ای انتخاب نشده است. لطفا ابتدا صفحه مورد نظر را با کلیک بر روی آن انتخاب نمایید."
+    }); //Set the position
+  }
 }
+
 function deleteActiveObject(e) {
   if ((e.keyCode === 46 || e.keyCode === 8) && !isEditing) {
-    var activeObject = fabricCanvas.getActiveObject();
+    var activeObject = currentFabricCanvas.getActiveObject();
     if (activeObject) {
-      fabricCanvas.remove(activeObject);
+      currentFabricCanvas.remove(activeObject);
     }
   }
 }
 function updateStyles(items) {
-  var activeObject = fabricCanvas.getActiveObject();
+  var activeObject = currentFabricCanvas.getActiveObject();
   if (activeObject) {
     activeObject.set({
       fontSize: (items === null || items === void 0 ? void 0 : items.fontSize) ? parseInt(items === null || items === void 0 ? void 0 : items.fontSize) : parseInt(document.getElementById("font-size").value),
@@ -65347,7 +65565,7 @@ function updateStyles(items) {
       fontWeight: (items === null || items === void 0 ? void 0 : items.bold) ? "bold" : "normal",
       fontStyle: (items === null || items === void 0 ? void 0 : items.italic) ? "italic" : "normal"
     });
-    fabricCanvas.renderAll();
+    currentFabricCanvas.renderAll();
     toggleEditor(true);
   }
 }
@@ -65359,11 +65577,12 @@ function loadImage() {
       top: 0,
       angle: 0
     }).scale(0.5);
-    fabricCanvas.add(oImg).renderAll();
+    currentFabricCanvas.add(oImg).renderAll();
   });
 }
 function handleImageUpload(e) {
-  var file = e.target.files[0];
+  var fileInput = e.target;
+  var file = fileInput.files[0];
   var reader = new FileReader();
   reader.onload = function (f) {
     var data = f.target.result;
@@ -65373,9 +65592,22 @@ function handleImageUpload(e) {
         top: 0,
         angle: 0
       }).scale(0.9);
-      fabricCanvas.add(oImg).renderAll();
-      fabricCanvas.setActiveObject(oImg);
+      if (currentPageId) {
+        var fabricCanvas = fabricCanvases[currentPageId];
+        fabricCanvas.add(oImg).renderAll();
+        fabricCanvas.setActiveObject(oImg);
+        // Highlight the selected canvas
+        document.getElementById(currentPageId).classList.add("selected");
+      } else {
+        // @ts-ignore
+        Snackbar.show({
+          pos: "top-center",
+          text: "هیچ صفحه‌ای انتخاب نشده است. لطفا ابتدا صفحه مورد نظر را با کلیک بر روی آن انتخاب نمایید."
+        }); //Set the position
+      }
     });
+    // Reset the file input element
+    fileInput.value = "";
   };
   reader.readAsDataURL(file);
 }
@@ -65447,7 +65679,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52281" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53633" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
