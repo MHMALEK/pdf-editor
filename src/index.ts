@@ -19,7 +19,7 @@ const colorPicker = createColorPicker(".color-picker");
 
 // Ensure pdfjs worker is initialized
 initializePDFjsWorker();
-// setupEventListeners()
+
 document
   .getElementById("pdf-upload-dropzone-file")
   .addEventListener("change", (e) => {
