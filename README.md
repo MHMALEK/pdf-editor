@@ -61,7 +61,8 @@ then you can develop and run it on develop env.
 
 Or you can just go and use the deployed version here:
 
-https://stellular-entremet-84b87a.netlify.app/
+https://pdf-editor-pure-js.netlify.app/
+
 
 ## Usage
 Load a PDF by clicking on the "Load PDF" button and selecting a file.
