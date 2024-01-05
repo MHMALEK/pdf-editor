@@ -1,13 +1,31 @@
-# My PDF Editor
+# 🚀 PDF Editor in JavaScript - Edit PDFs like a Boss!
 
-This project is a simple PDF editor that lets users load a PDF, add text to it, style the text and save the edited PDF. It uses Fabric.js for the canvas manipulation and text addition, jsPDF for PDF saving, and PDF.js for loading PDFs.
+Welcome to this exciting project that transforms your browser into a powerful PDF editor! Built purely in JavaScript, it allows you to add some pizzazz into your boring PDFs with text and images, and save them - all directly in your browser. No server-side processing, no problem!
 
-## Features
+## 🎉 Features
 
-- Load a PDF from a URL
-- Add text to the PDF
-- Style the text (font size, color, bold, italic, underline)
-- Save the edited PDF
+- **Edit PDF files in your browser**: Why download when you can do it online?
+- **Add text and images**: Make your PDFs more engaging!
+- **Save edited PDFs**: Keep what you love, discard what you don't!
+- **Pure JavaScript**: Because we love JavaScript!
+
+## 📚 Libraries Used
+
+This project shines thanks to several amazing libraries:
+
+- [Fabric.js](http://fabricjs.com/): Our magic wand for working with HTML canvas elements.
+- [jsPDF](https://github.com/MrRio/jsPDF): Our partner-in-crime for generating PDF files in JavaScript.
+- [Tailwind CSS](https://tailwindcss.com/): Our secret sauce for rapidly building custom user interfaces that are as unique as you are!
+
+## 🔨 Building
+
+We believe in the power of [Rollup](https://rollupjs.org/), which bundles our JavaScript code and morphs TypeScript into JavaScript.
+
+To join the fun of building this project, run:
+
+```bash
+npm install
+npm run build
 
 ## Getting Started
 
@@ -42,7 +60,11 @@ Start the development server:
 npm start
 ```
 
-Now, you should be able to see the project running at localhost:1234 (or whatever port your console tells you).
+then you can develop and run it on develop env.
+
+Or you can just go and use the deployed version here:
+
+https://stellular-entremet-84b87a.netlify.app/
 
 ## Usage
 Load a PDF by clicking on the "Load PDF" button and selecting a file.
@@ -54,6 +76,17 @@ Click on the "Save PDF" button to download the edited PDF.
 # Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-# License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
 
+🎁 License
+
+Free to use, free to explore! This project is all yours to play around with, but remember, it's mainly for testing purposes.
+
+
+🤝 Contribution
+
+We're all about learning and growing together. Contributions are more than welcome. Fork this project, make it your own, and create a pull request with your shiny new changes!
+
+
+⚠️ Disclaimer
+
+It's a playground for you to learn, test, and have fun. Please use wisely and at your own risk!
