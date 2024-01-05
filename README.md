@@ -23,10 +23,6 @@ We believe in the power of [Rollup](https://rollupjs.org/), which bundles our Ja
 
 To join the fun of building this project, run:
 
-```bash
-npm install
-npm run build
-
 ## Getting Started
 
 ### Prerequisites
