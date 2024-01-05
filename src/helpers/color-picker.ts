@@ -1,4 +1,5 @@
 import Pickr from "@simonwep/pickr";
+import "@simonwep/pickr/dist/themes/classic.min.css";
 
 function createColorPicker(selector: string) {
   return Pickr.create({
