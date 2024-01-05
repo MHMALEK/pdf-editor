@@ -21,14 +21,15 @@ This project shines thanks to several amazing libraries:
 
 We believe in the power of [Rollup](https://rollupjs.org/), which bundles our JavaScript code and morphs TypeScript into JavaScript.
 
-To join the fun of building this project, run:
 
-## Getting Started
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
+
+To join the fun of building this project, run:
+
 
 ### Installation
 
